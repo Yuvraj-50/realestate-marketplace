@@ -73,4 +73,76 @@ const signin = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, signin };
+const signInWithGoogle = async (req, res, next) => {
+  try {
+    const { username, email, photo } = req.body;
+
+    console.log(username, email, photo);
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      const token = jwt.sign({ id: existingUser._id }, process.env.SECRET_KEY);
+
+      res.cookie("access_token", token, { httpOnly: true });
+
+      const { password: pass, ...rest } = existingUser._doc;
+
+      res.status(200).json({
+        success: true,
+        data: rest,
+      });
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+
+      const saltRounds = 10;
+
+      const hashedPassword = await bcrypt.hash(generatedPassword, saltRounds);
+
+      const newUser = await new User({
+        username:
+          username.split(" ").join("").toLowerCase() +
+          Math.random().toString(36).slice(-4),
+        email,
+        password: hashedPassword,
+        avatar: photo,
+      });
+
+      newUser.save();
+
+      const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY);
+
+      const { password: pass, ...rest } = newUser._doc;
+
+      res.cookie("access_token", token, { httpOnly: true });
+
+      res.status(200).json({
+        success: true,
+        data: rest,
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const signOut = (req, res, next) => {
+  if (req.params.id !== req.user.id) {
+    return next(error(403, "You are not allowed to perform this action"));
+  }
+  
+  try {
+    res.clearCookie("access_token");
+
+    res.status(200).json({
+      success: true,
+      data: "user signed out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { signup, signin, signInWithGoogle, signOut };

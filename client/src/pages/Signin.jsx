@@ -7,6 +7,7 @@ import {
 } from "../redux/slices/userSlice";
 
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth/OAuth";
 
 function Signin() {
   const navigate = useNavigate();
@@ -82,6 +83,7 @@ function Signin() {
         >
           {loading ? "loading" : "sign in"}
         </button>
+        <OAuth />
       </form>
 
       {error && <p className="text-red-900">{error}</p>}
