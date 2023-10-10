@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 
 const userRouter = require("./Routes/userRoute");
 const authRouter = require("./Routes/authRoute");
+const listingRouter = require("./Routes/listingRoute");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/listing", listingRouter);
 
 app.listen(PORT, () => console.log("Server running on port 5000"));
 connectDB();

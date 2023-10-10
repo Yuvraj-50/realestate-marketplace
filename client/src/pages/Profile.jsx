@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -202,6 +203,12 @@ function Profile() {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link
+          className="text-center bg-green-700 text-white p-3 rounded-lg uppercase hover:opacity-95"
+          to="/createlisting"
+        >
+          create Listing
+        </Link>
       </form>
       <div className="flex m-5 justify-between">
         <span
@@ -217,6 +224,7 @@ function Profile() {
           Sign out
         </span>
       </div>
+
       {error && <p className="text-red-700"> {error} </p>}
       {updateSuccess && (
         <p className="text-green-700"> User updated successfully </p>
