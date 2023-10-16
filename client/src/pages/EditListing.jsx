@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
   getDownloadURL,
   getStorage,
@@ -9,7 +10,8 @@ import { app } from "../utils/firebase";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-function CreatingListing() {
+function EditListing() {
+  const params = useParams();
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
@@ -33,7 +35,41 @@ function CreatingListing() {
   const [error, setError] = useState("");
 
   const [imageUploadErr, setImageUploadErr] = useState("");
+
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const fetListing = async () => {
+      try {
+        const response = await fetch("/api/v1/listing/" + params.listingId);
+        let data = await response.json();
+        if (data.success == false) {
+          console.log(data.message);
+          return;
+        }
+
+        data = data.data;
+
+        setFormData({
+          images: data.images,
+          name: data.name,
+          description: data.description,
+          address: data.address,
+          type: data.type,
+          parking: data.parking,
+          furnished: data.furnished,
+          offer: data.offer,
+          bedrooms: data.bedrooms,
+          baths: data.baths,
+          regularprice: data.regularprice,
+          discountprice: data.discountprice,
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetListing();
+  }, []);
 
   const storeImage = (image) => {
     return new Promise((resolve, reject) => {
@@ -144,16 +180,21 @@ function CreatingListing() {
 
       formData.userRef = user._id;
 
-      const response = await fetch("/api/v1/listing/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch(
+        "/api/v1/listing/update/" + params.listingId,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        body: JSON.stringify(formData),
-      });
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
+
+      console.log(data, "updataed");
 
       if (data.success == false) {
         setError(data.message);
@@ -176,7 +217,7 @@ function CreatingListing() {
         regularprice: 0,
         discountprice: 0,
       });
-      navigate(`/listing/${data.data._id}`);
+      // navigate(`/listing/${data.data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -388,7 +429,7 @@ function CreatingListing() {
             disabled={loading || uploading}
             className="p-3 rounded-lg bg-slate-700 text-white uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? "Creating..." : "Create Listing"}
+            {loading ? "Creating..." : "Update Listing"}
           </button>
           {error && <p className="text-red-700 text-sm"> {error} </p>}
         </div>
@@ -397,4 +438,4 @@ function CreatingListing() {
   );
 }
 
-export default CreatingListing;
+export default EditListing;

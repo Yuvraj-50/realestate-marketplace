@@ -34,6 +34,9 @@ function Profile() {
   const [fileUploadErr, setFileUploadErr] = useState(null);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showListingErr, setShowListingErr] = useState(false);
+  const [UserListing, setUserListing] = useState([]);
+  const [listingExists, setListingExists] = useState(false);
 
   useEffect(() => {
     if (file) {
@@ -41,7 +44,7 @@ function Profile() {
     }
   }, [file]);
 
-  const handleFileUpload = async (file) => {
+  const handleFileUpload = (file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
@@ -144,6 +147,42 @@ function Profile() {
     }
   };
 
+  const handleShowListing = async () => {
+    try {
+      setShowListingErr(false);
+      const response = await fetch(`/api/v1/users/listing/${user._id}`);
+      const data = await response.json();
+
+      if (data.success == false) {
+        setShowListingErr(false);
+        return;
+      }
+
+      setUserListing(data.data);
+      setListingExists((prev) => !prev);
+    } catch (error) {
+      setShowListingErr(true);
+    }
+  };
+
+  const handleDeleteListing = async (id) => {
+    try {
+      const response = await fetch(`/api/v1/listing/delete/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (data.success == false) {
+        return;
+      }
+
+      setUserListing((prev) => {
+        return prev.filter((listing) => listing._id !== id);
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -228,6 +267,53 @@ function Profile() {
       {error && <p className="text-red-700"> {error} </p>}
       {updateSuccess && (
         <p className="text-green-700"> User updated successfully </p>
+      )}
+      <button className="text-green-700 w-full" onClick={handleShowListing}>
+        showListing
+      </button>
+      {showListingErr && (
+        <p className="text-red-700 mt-5">something went wrong</p>
+      )}
+
+      <div>
+        {UserListing && UserListing.length > 0 && (
+          <div>
+            <p className="font-bold text-2xl text-center my-7">User Listing</p>
+            {UserListing.map((listing) => (
+              <div
+                className="border p-3 flex justify-between items-center my-8"
+                key={listing._id}
+              >
+                <Link to={`/listing/${listing._id}`}>
+                  <img
+                    className="w-16 h-16 object-contain rounded-lg"
+                    src={listing.images[0]}
+                    alt=""
+                  />
+                </Link>
+                <Link to={`/listing/${listing._id}`}>
+                  <p className="font-semibold flex-1 text-slate-700 hover:underline truncate">
+                    {listing.name}
+                  </p>
+                </Link>
+                <div className=" flex-col items-center flex">
+                  <Link to={`/editlisting/${listing._id}`}>
+                    <button className="text-red-700 uppercase">Edit</button>
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteListing(listing._id)}
+                    className="text-green-700 uppercase"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {listingExists && UserListing.length == 0 && (
+        <p className="text-center text-lg">No Listing found</p>
       )}
     </div>
   );

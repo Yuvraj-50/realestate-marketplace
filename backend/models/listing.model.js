@@ -15,19 +15,18 @@ const listingSchema = new Schema(
       type: String,
       required: true,
     },
-    regularPrice: {
+    regularprice: {
       type: Number,
       required: true,
     },
-    discountedPrice: {
+    discountprice: {
       type: Number,
-      required: true,
-    },
-    bathrooms: {
-      type: Number,
-      required: true,
     },
     bedrooms: {
+      type: Number,
+      required: true,
+    },
+    baths: {
       type: Number,
       required: true,
     },
@@ -47,7 +46,7 @@ const listingSchema = new Schema(
       type: Boolean,
       required: true,
     },
-    imageUrl: {
+    images: {
       type: Array,
       required: true,
     },
