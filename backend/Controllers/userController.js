@@ -23,7 +23,6 @@ async function updateUser(req, res, next) {
 
     const existingUser = await User.findById(req.params.id);
 
-    console.log(existingUser.email, req.body.email);
 
     if (existingUser.email === req.body.email) {
       return next(error(403, "Email already in use"));

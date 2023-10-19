@@ -122,7 +122,7 @@ function Profile() {
       }
 
       dispatch(deleteUserSuccess());
-      console.log(data);
+      
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }

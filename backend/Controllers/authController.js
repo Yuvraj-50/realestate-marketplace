@@ -77,8 +77,6 @@ const signInWithGoogle = async (req, res, next) => {
   try {
     const { username, email, photo } = req.body;
 
-    console.log(username, email, photo);
-
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {

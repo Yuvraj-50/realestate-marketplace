@@ -64,6 +64,7 @@ function EditListing() {
           regularprice: data.regularprice,
           discountprice: data.discountprice,
         });
+        
       } catch (error) {
         console.log(error.message);
       }
@@ -194,8 +195,6 @@ function EditListing() {
 
       const data = await response.json();
 
-      console.log(data, "updataed");
-
       if (data.success == false) {
         setError(data.message);
         setLoading(false);
@@ -217,7 +216,7 @@ function EditListing() {
         regularprice: 0,
         discountprice: 0,
       });
-      // navigate(`/listing/${data.data._id}`);
+      navigate(`/listing/${data.data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);

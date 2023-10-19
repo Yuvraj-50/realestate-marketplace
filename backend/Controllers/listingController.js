@@ -69,7 +69,62 @@ const getSingleListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
     const user = await User.findById(listing.userRef);
-    listing.userRef = JSON.stringify(user);
+    const { password, ...rest } = user;
+
+    listing.userRef = JSON.stringify(rest._doc);
+
+    res.status(200).json({
+      success: true,
+      data: listing,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getListings = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 9;
+    const startIndex = parseInt(req.query.startIndex) || 0;
+
+    let offer = req.query.offer;
+    let furnished = req.query.furnished;
+    let parking = req.query.parking;
+    let type = req.query.type;
+
+    const searchTerm = req.query.searchTerm || "";
+
+    const sortBy = req.query.sort || "createdAt";
+
+    const order = req.query.order || "desc";
+
+    if (!offer) {
+      offer = { $in: [true, false] };
+    }
+
+    if (!furnished) {
+      furnished = { $in: [true, false] };
+    }
+
+    if (!parking) {
+      parking = { $in: [true, false] };
+    }
+
+    if (!type || type === "all") {
+      type = { $in: ["sale", "rent"] };
+    }
+
+    const listing = await Listing.find({
+      name: { $regex: searchTerm, $options: "i" },
+      offer,
+      parking,
+      furnished,
+      type,
+    })
+      .sort({ [sortBy]: order })
+      .limit(limit)
+      .skip(startIndex);
+
     res.status(200).json({
       success: true,
       data: listing,
@@ -84,4 +139,5 @@ module.exports = {
   getSingleListing,
   deleteListing,
   updateListing,
+  getListings,
 };
