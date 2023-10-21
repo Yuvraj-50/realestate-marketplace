@@ -31,7 +31,7 @@ function Home() {
     const fetchSaleListing = async () => {
       try {
         const response = await fetch(
-          "/api/v1/listing/getListings?sale=true&limit=4"
+          "/api/v1/listing/getListings?type=sale&limit=4"
         );
         const data = await response.json();
         setSaleListing(data.data);
@@ -43,7 +43,7 @@ function Home() {
     const fetchRentListing = async () => {
       try {
         const response = await fetch(
-          "/api/v1/listing/getListings?rent=true&limit=4"
+          "/api/v1/listing/getListings?type=rent&limit=4"
         );
         const data = await response.json();
         setRentListing(data.data);
@@ -134,7 +134,7 @@ function Home() {
               >
                 <Link
                   className="text-sm text-blue-800 hover:underline"
-                  to={`/search?sale=true`}
+                  to={`/search?type=sale`}
                 >
                   Some more houses
                 </Link>
@@ -162,7 +162,7 @@ function Home() {
               >
                 <Link
                   className="text-sm text-blue-800 hover:underline"
-                  to={`/search?rent=true`}
+                  to={`/search?type=rent`}
                 >
                   Some more houses
                 </Link>
